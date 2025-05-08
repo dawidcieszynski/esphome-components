@@ -84,14 +84,14 @@ namespace
         vector<uchar> content;
         t->extractPayload(&content);
 
-        if (t->tpl_ci == 0xB6) {
-            // tpl-ci-field B6, there's a header to skip
-            // first byte contains following header length
-            uint header_len = content[0] + 1;
+        // if (t->tpl_ci == 0xB6) {
+        //     // tpl-ci-field B6, there's a header to skip
+        //     // first byte contains following header length
+        //     uint header_len = content[0] + 1;
 
-            //drop header data from content
-            content.erase(content.begin(), content.begin() + header_len);
-        }
+        //     //drop header data from content
+        //     content.erase(content.begin(), content.begin() + header_len);
+        // }
 
         if (t->tpl_ci == 0xA0) {
             // In my opinion this is already part of the telegram data
@@ -101,22 +101,22 @@ namespace
             content.insert(content.begin(),t->tpl_ci);
         }
 
-        if (content.size() != 16)
-        {
-            // Payload most likely is broken
-            debugPayload("(apatoreitn) content size wrong!", content);
-            return;
-        }
+        // if (content.size() != 54)
+        // {
+        //     // Payload most likely is broken
+        //     debugPayload("(apatoreitn) content size wrong!", content);
+        //     return;
+        // }
 
         // Season start date + install date + some flag?
         //
         // Note: may be wrong, requires confirmation as all meters I see in range
         //       report start date 1.05, installed in 2016 and field is A0A1h
         // Note: NOT byte swapped. Accidentally? works via dateToString conversion.
-        uchar season_start_date_lo = content[1];
-        uchar season_start_date_hi = content[0];
-        string season_start_date = dateToString(season_start_date_lo, season_start_date_hi);
-        setStringValue("season_start_date", season_start_date, NULL);
+        // uchar season_start_date_lo = content[1];
+        // uchar season_start_date_hi = content[0];
+        // string season_start_date = dateToString(season_start_date_lo, season_start_date_hi);
+        // setStringValue("season_start_date", season_start_date, NULL);
 
         // Previous season total allocation
         uchar prev_lo = content[4];
@@ -124,35 +124,35 @@ namespace
         double previous_hca = (256.0*prev_hi+prev_lo);
         setNumericValue("previous", Unit::HCA, previous_hca);
 
-        // Electronic seal break date
-        uchar esb_date_lo = content[6];
-        uchar esb_date_hi = content[7];
-        string esb_date = dateToString(esb_date_lo, esb_date_hi);
-        setStringValue("esb_date", esb_date, NULL);
+        // // Electronic seal break date
+        // uchar esb_date_lo = content[6];
+        // uchar esb_date_hi = content[7];
+        // string esb_date = dateToString(esb_date_lo, esb_date_hi);
+        // setStringValue("esb_date", esb_date, NULL);
 
         // Current season allocation
-        uchar curr_lo = content[8];
-        uchar curr_hi = content[9];
+        uchar curr_lo = content[9];
+        uchar curr_hi = content[10];
         double current_hca = (256.0*curr_hi+curr_lo);
         setNumericValue("current", Unit::HCA, current_hca);
 
         // Current date reported by meter
-        uchar date_curr_lo = content[10];
-        uchar date_curr_hi = content[11];
-        string current_date = dateToString(date_curr_lo, date_curr_hi);
-        setStringValue("current_date", current_date, NULL);
+        // uchar date_curr_lo = content[10];
+        // uchar date_curr_hi = content[11];
+        // string current_date = dateToString(date_curr_lo, date_curr_hi);
+        // setStringValue("current_date", current_date, NULL);
 
         // Previous season average temperature
-        double temp_room_prev_avg_frac = content[12];
-        double temp_room_prev_avg_deg = content[13];
+        double temp_room_prev_avg_frac = content[41];
+        double temp_room_prev_avg_deg = content[42];
         double temp_room_prev_avg = temp_room_prev_avg_deg + temp_room_prev_avg_frac/256.0;
         setNumericValue("temp_room_prev_avg", Unit::C, temp_room_prev_avg);
 
         // Current season average temperature
-        double temp_room_avg_frac = content[14];
-        double temp_room_avg_deg = content[15];
-        double temp_room_avg = temp_room_avg_deg + temp_room_avg_frac/256.0;
-        setNumericValue("temp_room_avg", Unit::C, temp_room_avg);
+        // double temp_room_avg_frac = content[14];
+        // double temp_room_avg_deg = content[15];
+        // double temp_room_avg = temp_room_avg_deg + temp_room_avg_frac/256.0;
+        // setNumericValue("temp_room_avg", Unit::C, temp_room_avg);
     }
 
     string Driver::dateToString(uchar date_lo, uchar date_hi) {
